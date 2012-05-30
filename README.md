@@ -21,7 +21,7 @@ To install the necessary requirements of an existing project, run this in the pr
     django-kraken.py (with no arguments)
 
 The script will auto-detect that you are in a project directory (which contains a requirements.txt file)
-and install the requirements using pip. It will also create a virtualenv for the project using virtualenvwrapper.
+and install the requirements. It will also create a virtualenv for the project using virtualenvwrapper.
 
 ## Project directory layout
 
@@ -41,4 +41,10 @@ Generated projects use a layout familiar from Heroku:
        +--settings.py
           manage.py
           etc.
+
+## For more information
+
+To see full help about the options, run:
+
+    django-kraken.py --help
 
