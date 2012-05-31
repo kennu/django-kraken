@@ -1,7 +1,7 @@
 #!/bin/sh
 # This deploy script can be executed from the Git post-receive hook.
 # We assume that the application is installed in $HOME/$APPNAME.
-export HOME=/home/`/usr/bin/whoami`
+export HOME="/home/{{ server_user }}"
 APPNAME="{{ project_name }}"
 APPHOME="$HOME/$APPNAME"
 cd "$APPHOME"

@@ -26,6 +26,22 @@
             <span class="icon-bar"></span>
           </a>
           <a class="brand" href="{% url home %}">{{[[ project_title ]]}}</a>
+          {% if request.user.is_authenticated %}
+          <div class="btn-group pull-right">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-user"></i> {{ request.user.username }}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url home %}">My Profile</a></li>
+              {% if request.user.is_staff %}
+              <li><a href="{% url index %}">Admin</a></li>
+              {% endif %}
+              <li class="divider"></li>
+              <li><a href="{% url auth_logout %}">Sign Out</a></li>
+            </ul>
+          </div>
+          {% endif %}
           <div class="nav-collapse">
             <ul class="nav">
               <li class="active"><a href="{% url home %}">Home</a></li>

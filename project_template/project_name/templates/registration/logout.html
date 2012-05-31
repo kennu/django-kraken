@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row-fluid">
+    <div class="span12">
+        <div class="page-header">
+            <h1>Goodbye!</h1>
+        </div>
+        <div>
+            <a href="{% url auth_login %}">Sign in again</a>
+        </div>
+    </div>
+</div><!--/row-->
+{% endblock %}

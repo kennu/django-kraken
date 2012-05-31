@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row-fluid">
+    <div class="span12">
+        <div class="page-header">
+            <h1>Activation successful</h1>
+        </div>
+        <div>
+            Welcome to {{[[ project_title ]]}}! <a href="{% url home %}">Continue to your account</a>
+        </div>
+    </div>
+</div><!--/row-->
+{% endblock %}

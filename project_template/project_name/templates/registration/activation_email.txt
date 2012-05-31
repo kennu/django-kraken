@@ -1,0 +1,5 @@
+Your {{[[ project_title ]]}} account activation link:
+
+http://{{ site }}/accounts/activate/{{ activation_key }}/
+
+See you soon!

@@ -9,6 +9,11 @@ urlpatterns = patterns('home.views',
     url(r'^$', 'home', name='home'),
 )
 
+# Registration views
+urlpatterns += patterns('',
+    (r'^accounts/', include('registration.backends.default.urls')),
+)
+
 # Django system views
 urlpatterns += patterns('',
     # Enable admin documentation:
