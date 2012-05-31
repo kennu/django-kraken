@@ -1,0 +1,1 @@
+[{"pk": {{ site_id }}, "model": "sites.site", "fields": {"domain": "{{ project_name }}.com", "name": "{{ project_name }}.com"}}]

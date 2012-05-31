@@ -9,6 +9,12 @@ urlpatterns = patterns('home.views',
     url(r'^$', 'home', name='home'),
 )
 
+# User views
+urlpatterns += patterns('users.views',
+    url(r'^users/(?P<id>[^/]+)$', 'profile', name='user_profile'),
+    url(r'^me$', 'profile_me', name='user_profile_me'),
+)
+
 # Registration views
 urlpatterns += patterns('',
     (r'^accounts/', include('registration.backends.default.urls')),

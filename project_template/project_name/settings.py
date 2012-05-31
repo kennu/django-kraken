@@ -69,6 +69,9 @@ STATIC_ROOT = BASE_PATH + '/public/static/'
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/public/static/'
 
+# Admin URL prefix for Django 1.3
+ADMIN_MEDIA_PREFIX = '/public/static/admin/'
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -140,6 +143,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
 {{ installed_apps }}
     'home',
+    'users',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -190,4 +194,6 @@ MEDIA_BUNDLES = (
 # Login and registration settings
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
+LOGIN_REDIRECT_URL = '/me'
+AUTH_PROFILE_MODULE = 'users.UserProfile'
 

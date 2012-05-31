@@ -1,1 +1,3 @@
-# Main CoffeeScript application is here
+# Main CoffeeScript application
+$ ->
+    $('#id_username').focus()

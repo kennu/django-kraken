@@ -199,7 +199,7 @@ def setup_template_variables():
     if not TEMPLATE_VARIABLES['site_id']:
         if ACTIVE_PARAMS['db'] == 'mongodb':
             # MongoDB needs an ObjectId string for site id
-            TEMPLATE_VARIABLES['site_id'] = "'4fc6a88d8115a2d82e79bd27'"
+            TEMPLATE_VARIABLES['site_id'] = '"4fc6a88d8115a2d82e79bd27"' # must use double quotes to work in fixture
         else:
             TEMPLATE_VARIABLES['site_id'] = "1"
     if not TEMPLATE_VARIABLES['db_engine']:
@@ -252,7 +252,12 @@ def apply_templates(template_path, project_path):
             # Apply templates in subdir
             apply_templates(source, target)
         else:
-            apply_template(source, target)
+            # Skip some templates
+            if ACTIVE_PARAMS['db'] != 'mongodb' and template == 'sites.json':
+                # Skip sites fixture for non-mongodb installation
+                pass
+            else:
+                apply_template(source, target)
     return True
 
 def create_django_project():
@@ -280,6 +285,21 @@ def generate_static_files():
     except subprocess.CalledProcessError:
         print('Failed to run collectstatic, aborting.')
         return False
+    return True
+
+def run_syncdb():
+    os.chdir(os.path.join(ACTIVE_PARAMS['path'], PROJECT_NAME))
+    try:
+        subprocess.call('%s manage.py syncdb' % (os.path.join(ACTIVE_PARAMS['workon-home'], PROJECT_NAME, 'bin', 'python')), shell=True)
+    except subprocess.CalledProcessError:
+        print('Failed to run syncdb, aborting.')
+        return False
+    if ACTIVE_PARAMS['db'] == 'mongodb':
+        try:
+            subprocess.call('%s manage.py loaddata sites' % (os.path.join(ACTIVE_PARAMS['workon-home'], PROJECT_NAME, 'bin', 'python')), shell=True)
+        except subprocess.CalledProcessError:
+            print('Failed to run loaddata, aborting.')
+            return False
     return True
 
 def create_project():
@@ -318,6 +338,9 @@ def create_project():
     
     # 6. Generate static files
     if not generate_static_files(): return
+    
+    # 7. Run syncdb to create tables
+    if not run_syncdb(): return
     
     # If enabled, start runserver on the project now
     if ACTIVE_OPTIONS['runserver']:
