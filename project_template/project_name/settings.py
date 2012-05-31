@@ -167,7 +167,7 @@ LOGGING = {
 
 {{ append_slash }}
 
-# Mediagenerator
+# Mediagenerator settings
 MEDIA_DEV_MODE = DEBUG
 DEV_MEDIA_URL = '/devmedia/'
 PRODUCTION_MEDIA_URL = '/media/'
@@ -186,3 +186,8 @@ MEDIA_BUNDLES = (
         'js/application.coffee',
     ),
 )
+
+# Login and registration settings
+LOGIN_URL = '/accounts/login/'
+LOGOUT_URL = '/accounts/logout/'
+

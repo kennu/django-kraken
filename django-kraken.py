@@ -85,6 +85,9 @@ ACTIVE_PARAMS = dict([(opt[2:], default) for opt, (doc, default) in AVAILABLE_PA
 TEMPLATE_VARIABLES = {
     'project_name': '',
     'project_title': '',
+    'server_user': '',
+    'web_user': '',
+    'web_group': '',
     'admins': '',
     'time_zone': '',
     'site_id': '',
@@ -185,6 +188,12 @@ def setup_template_variables():
         TEMPLATE_VARIABLES['project_name'] = PROJECT_NAME
     if not TEMPLATE_VARIABLES['project_title']:
         TEMPLATE_VARIABLES['project_title'] = PROJECT_NAME.capitalize()
+    if not TEMPLATE_VARIABLES['server_user']:
+        TEMPLATE_VARIABLES['server_user'] = 'kraken'
+    if not TEMPLATE_VARIABLES['web_user']:
+        TEMPLATE_VARIABLES['web_user'] = 'www-data'
+    if not TEMPLATE_VARIABLES['web_group']:
+        TEMPLATE_VARIABLES['web_group'] = 'www-data'
     if not TEMPLATE_VARIABLES['time_zone']:
         TEMPLATE_VARIABLES['time_zone'] = 'Europe/Helsinki'
     if not TEMPLATE_VARIABLES['site_id']:
@@ -225,7 +234,7 @@ def apply_template(source, target):
     with open(source, 'r') as f:
         content = f.read()
     # Expand variables only for dotfiles and .py files
-    content = expand_template_variables(content, not (name.startswith('.') or name.endswith('.py')))
+    content = expand_template_variables(content, name.endswith('.html') or name.endswith('.txt'))
     # Make sure target directory exists
     dirname = os.path.dirname(target)
     if not os.path.exists(dirname):
@@ -238,7 +247,7 @@ def apply_template(source, target):
 def apply_templates(template_path, project_path):
     for template in os.listdir(template_path):
         source = os.path.join(template_path, template)
-        target = os.path.join(project_path, PROJECT_NAME if template == 'project_name' else template)
+        target = os.path.join(project_path, template.replace('project_name', PROJECT_NAME))
         if os.path.isdir(source):
             # Apply templates in subdir
             apply_templates(source, target)
