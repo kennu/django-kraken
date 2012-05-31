@@ -8,7 +8,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
-    {{ admins }}
+{{ admins }}
 )
 
 MANAGERS = ADMINS
@@ -95,6 +95,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'mediagenerator.middleware.MediaMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -113,7 +114,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-    {{ template_context_processors }}
+{{ template_context_processors }}
 )
 
 ROOT_URLCONF = '{{ project_name }}.urls'
@@ -137,7 +138,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    {{ installed_apps }}
+{{ installed_apps }}
+    'home',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -148,15 +150,9 @@ INSTALLED_APPS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
-            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         }
     },
@@ -170,3 +166,23 @@ LOGGING = {
 }
 
 {{ append_slash }}
+
+# Mediagenerator
+MEDIA_DEV_MODE = DEBUG
+DEV_MEDIA_URL = '/devmedia/'
+PRODUCTION_MEDIA_URL = '/media/'
+MEDIA_BUNDLES = (
+    ('main.css',
+        'css/bootstrap.min.css',
+        'css/font-awesome.css',
+        'css/application.scss',
+        'css/bootstrap-responsive.min.css',
+    ),
+    ('dependencies.js',
+        'js/jquery-1.7.2.min.js',
+        'js/bootstrap.min.js',
+    ),
+    ('main.js',
+        'js/application.coffee',
+    ),
+)

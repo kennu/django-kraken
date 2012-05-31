@@ -26,8 +26,11 @@ AVAILABLE_OPTIONS = {
     '--no-social-auth': "%(o)s      : Don't install django-social-auth",
     '--no-bootstrap': "%(o)s        : Don't install Twitter Bootstrap files",
     '--no-jquery': "%(o)s           : Don't install jQuery files",
-    '--no-gitignore': "%(s)s        : Don't add a .gitignore file to the project",
-    '--overwrite': "%(s)s           : Overwrite existing project (will delete everything first)",
+    '--no-gitignore': "%(o)s        : Don't add a .gitignore file to the project",
+    '--no-mongom2m': "%(o)s         : Don't add django-mongom2m (when using MongoDB)",
+    '--append-slash': "%(o)s        : Use APPEND_SLASH = True in Django settings (defaults to False)",
+    '--overwrite': "%(o)s           : Overwrite existing project (will delete everything first)",
+    '--runserver': "%(o)s           : Execute manage.py runserver after creating project",
 }
 
 # Available parameter options. The default value is the second value of the tuple.
@@ -53,11 +56,12 @@ OPTIONAL_PACKAGES = {
     'registration': ['django-registration'],
     'facebook': ['django-facebook'],
     'social-auth': ['django-social-auth'],
+    'mongom2m': ['django-mongom2m'],
 }
 
 # Which additional PyPI packages are needed for each database engine
 DB_PACKAGES = {
-    'mongodb': ['django-nonrel', 'djangotoolbox', 'django-mongodb-engine', 'django-mongom2m', 'pymongo'],
+    'mongodb': ['django-nonrel', 'djangotoolbox', 'django-mongodb-engine', 'pymongo'],
     'mysql': ['mysql-python'],
 }
 
@@ -80,6 +84,7 @@ ACTIVE_PARAMS = dict([(opt[2:], default) for opt, (doc, default) in AVAILABLE_PA
 # Template variables to expand.
 TEMPLATE_VARIABLES = {
     'project_name': '',
+    'project_title': '',
     'admins': '',
     'time_zone': '',
     'site_id': '',
@@ -93,7 +98,7 @@ TEMPLATE_VARIABLES = {
     'template_context_processors': '',
     'middleware_classes': '',
     'installed_apps': '',
-    'append_slash': 'APPEND_SLASH = False',
+    'append_slash': '',
 }
 
 def print_info():
@@ -177,7 +182,9 @@ def install_requirements():
 
 def setup_template_variables():
     if not TEMPLATE_VARIABLES['project_name']:
-        TEMPLATE_VARIABLES['project_name'] = '%s' % PROJECT_NAME
+        TEMPLATE_VARIABLES['project_name'] = PROJECT_NAME
+    if not TEMPLATE_VARIABLES['project_title']:
+        TEMPLATE_VARIABLES['project_title'] = PROJECT_NAME.capitalize()
     if not TEMPLATE_VARIABLES['time_zone']:
         TEMPLATE_VARIABLES['time_zone'] = 'Europe/Helsinki'
     if not TEMPLATE_VARIABLES['site_id']:
@@ -196,22 +203,29 @@ def setup_template_variables():
     if not TEMPLATE_VARIABLES['secret_key']:
         TEMPLATE_VARIABLES['secret_key'] = ''.join([random.choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
     if not TEMPLATE_VARIABLES['installed_apps']:
-        TEMPLATE_VARIABLES['installed_apps'] = ''
+        apps = ''
+        if ACTIVE_PARAMS['db'] == 'mongodb': apps += "    'djangotoolbox',\n"
+        if ACTIVE_OPTIONS['extensions']: apps += "    'django_extensions',\n"
+        if ACTIVE_OPTIONS['mediagenerator']: apps += "    'mediagenerator',\n"
+        if ACTIVE_OPTIONS['social-auth']: apps += "    'social_auth',\n"
+        if ACTIVE_OPTIONS['gravatar']: apps += "    'gravatar',\n"
+        if ACTIVE_OPTIONS['mongom2m']: apps += "    'mongom2m',\n"
+        TEMPLATE_VARIABLES['installed_apps'] = apps
+    if not TEMPLATE_VARIABLES['append_slash']:
+        TEMPLATE_VARIABLES['append_slash'] = "APPEND_SLASH = %s" % ACTIVE_OPTIONS['append-slash']
     
-def expand_template_variables(content):
+def expand_template_variables(content, is_django_template):
     for key, value in TEMPLATE_VARIABLES.items():
-        content = re.sub(r'\{\{ *%s *\}\}' % key, value, content)
+        content = re.sub(r'\{\{ *%s *\}\}' % key if not is_django_template else r'\{\{\[\[ *%s *\]\]\}\}' % key, value, content)
     return content
 
 def apply_template(source, target):
-    print('Applying template %s => %s' % (source, target))
     name = os.path.basename(target)
     # Read template source
     with open(source, 'r') as f:
         content = f.read()
     # Expand variables only for dotfiles and .py files
-    if name.startswith('.') or name.endswith('.py'):
-        content = expand_template_variables(content)
+    content = expand_template_variables(content, not (name.startswith('.') or name.endswith('.py')))
     # Make sure target directory exists
     dirname = os.path.dirname(target)
     if not os.path.exists(dirname):
@@ -242,6 +256,21 @@ def create_django_project():
     # Django project generated.
     print('Successfully generated Django project: %s' % PROJECT_NAME)
     apply_templates(ACTIVE_PARAMS['template'], ACTIVE_PARAMS['path'])
+    return True
+
+def generate_static_files():
+    os.chdir(os.path.join(ACTIVE_PARAMS['path'], PROJECT_NAME))
+    if ACTIVE_OPTIONS['mediagenerator']:
+        try:
+            subprocess.check_call('%s manage.py generatemedia' % (os.path.join(ACTIVE_PARAMS['workon-home'], PROJECT_NAME, 'bin', 'python')), shell=True)
+        except subprocess.CalledProcessError:
+            print('Failed to run generatemedia, aborting.')
+            return False
+    try:
+        subprocess.call('%s manage.py collectstatic -v 0 --link --noinput' % (os.path.join(ACTIVE_PARAMS['workon-home'], PROJECT_NAME, 'bin', 'python')), shell=True)
+    except subprocess.CalledProcessError:
+        print('Failed to run collectstatic, aborting.')
+        return False
     return True
 
 def create_project():
@@ -277,6 +306,14 @@ def create_project():
     
     # 5. Create the Django project
     if not create_django_project(): return
+    
+    # 6. Generate static files
+    if not generate_static_files(): return
+    
+    # If enabled, start runserver on the project now
+    if ACTIVE_OPTIONS['runserver']:
+        os.chdir(os.path.join(ACTIVE_PARAMS['path'], PROJECT_NAME))
+        subprocess.call('%s manage.py runserver' % (os.path.join(ACTIVE_PARAMS['workon-home'], PROJECT_NAME, 'bin', 'python')), shell=True)
 
 def check_kraken_requirements():
     global VIRTUALENV_VERSION, HAS_VIRTUALENVWRAPPER
@@ -340,13 +377,15 @@ def main():
         print_help()
         return
     
-    # Default virtualenv name to project name
+    # Set up some defaults
     if not ACTIVE_PARAMS['virtualenv']:
         ACTIVE_PARAMS['virtualenv'] = PROJECT_NAME
     if not ACTIVE_PARAMS['path']:
         ACTIVE_PARAMS['path'] = os.path.join(os.getcwd(),  PROJECT_NAME)
     if not ACTIVE_PARAMS['template']:
         ACTIVE_PARAMS['template'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'project_template')
+    if ACTIVE_PARAMS['db'] != 'mongodb':
+        ACTIVE_OPTIONS['mongom2m'] = False
     
     # Check other requirements
     if not check_kraken_requirements(): return
