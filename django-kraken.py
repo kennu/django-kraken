@@ -16,30 +16,31 @@ HAS_VIRTUALENVWRAPPER = False
 
 # Available true/false options. The default is true if the option beings with 'no-'.
 AVAILABLE_OPTIONS = {
-    '--no-conf': "%(o)s             : Don't generate Linux configuration files in conf directory",
-    '--no-gunicorn': "%(o)s         : Don't install gunicorn (WSGI server)",
-    '--no-extensions': "%(o)s       : Don't install django-extensions",
-    '--no-mediagenerator': "%(o)s   : Don't install django-mediagenerator",
-    '--no-gravatar': "%(o)s         : Don't install django-gravatar",
-    '--no-registration': "%(o)s     : Don't install django-registration",
-    '--no-facebook': "%(o)s         : Don't install django-facebook",
-    '--no-social-auth': "%(o)s      : Don't install django-social-auth",
-    '--no-bootstrap': "%(o)s        : Don't install Twitter Bootstrap files",
-    '--no-jquery': "%(o)s           : Don't install jQuery files",
-    '--no-gitignore': "%(o)s        : Don't add a .gitignore file to the project",
-    '--no-mongom2m': "%(o)s         : Don't add django-mongom2m (when using MongoDB)",
-    '--append-slash': "%(o)s        : Use APPEND_SLASH = True in Django settings (defaults to False)",
-    '--overwrite': "%(o)s           : Overwrite existing project (will delete everything first)",
-    '--runserver': "%(o)s           : Execute manage.py runserver after creating project",
+    '--no-conf': "%(o)s                 : Don't generate Linux configuration files in conf directory",
+    '--no-gunicorn': "%(o)s             : Don't install gunicorn (WSGI server)",
+    '--no-extensions': "%(o)s           : Don't install django-extensions",
+    '--no-mediagenerator': "%(o)s       : Don't install django-mediagenerator",
+    '--no-gravatar': "%(o)s             : Don't install django-gravatar",
+    '--no-registration': "%(o)s         : Don't install django-registration",
+    '--no-emailusernames': "%(o)s       : Don't install django-email-as-username",
+    '--no-facebook': "%(o)s             : Don't install django-facebook",
+    '--no-social-auth': "%(o)s          : Don't install django-social-auth",
+    '--no-bootstrap': "%(o)s            : Don't install Twitter Bootstrap files",
+    '--no-jquery': "%(o)s               : Don't install jQuery files",
+    '--no-gitignore': "%(o)s            : Don't add a .gitignore file to the project",
+    '--no-mongom2m': "%(o)s             : Don't add django-mongom2m (when using MongoDB)",
+    '--append-slash': "%(o)s            : Use APPEND_SLASH = True in Django settings (defaults to False)",
+    '--overwrite': "%(o)s               : Overwrite existing project (will delete everything first)",
+    '--runserver': "%(o)s               : Execute manage.py runserver after creating project",
 }
 
 # Available parameter options. The default value is the second value of the tuple.
 AVAILABLE_PARAMS = {
-    '--db':("%(o)s <engine>         : Select database engine to use (mongodb, mysql, default: %(d)s)", 'mongodb'),
-    '--virtualenv':("%(o)s <name>   : Set name of virtualenv to use (default: project name)", None),
-    '--workon-home':("%(o)s <path>  : Set basepath of virtualenvs (default: $WORKON_HOME or ~/.virtualenvs)", None),
-    '--path':("%(o)s <path>         : Set project path (default: project name in current directory)", None),
-    '--template':("%(o)s <path>     : Set project template path (default: built-in)", None),
+    '--db':("%(o)s <engine>             : Select database engine to use (mongodb, mysql, default: %(d)s)", 'mongodb'),
+    '--virtualenv':("%(o)s <name>       : Set name of virtualenv to use (default: project name)", None),
+    '--workon-home':("%(o)s <path>      : Set basepath of virtualenvs (default: $WORKON_HOME or ~/.virtualenvs)", None),
+    '--path':("%(o)s <path>             : Set project path (default: project name in current directory)", None),
+    '--template':("%(o)s <path>         : Set project template path (default: built-in)", None),
 }
 
 # Which PyPI packages are needed always
@@ -56,6 +57,7 @@ OPTIONAL_PACKAGES = {
     'registration': ['django-registration'],
     'facebook': ['django-facebook'],
     'social-auth': ['django-social-auth'],
+    'emailusernames': ['django-email-as-username'],
     'mongom2m': ['django-mongom2m'],
 }
 
@@ -98,6 +100,7 @@ TEMPLATE_VARIABLES = {
     'db_host': '',
     'db_port': '',
     'secret_key': '',
+    'auth_backends': '',
     'template_context_processors': '',
     'middleware_classes': '',
     'installed_apps': '',
@@ -216,12 +219,17 @@ def setup_template_variables():
         if ACTIVE_PARAMS['db'] == 'mongodb': apps += "    'djangotoolbox',\n"
         if ACTIVE_OPTIONS['extensions']: apps += "    'django_extensions',\n"
         if ACTIVE_OPTIONS['mediagenerator']: apps += "    'mediagenerator',\n"
+        if ACTIVE_OPTIONS['registration']: apps += "    'registration',\n"
+        if ACTIVE_OPTIONS['emailusernames']: apps += "    'emailusernames',\n"
         if ACTIVE_OPTIONS['social-auth']: apps += "    'social_auth',\n"
         if ACTIVE_OPTIONS['gravatar']: apps += "    'gravatar',\n"
         if ACTIVE_OPTIONS['mongom2m']: apps += "    'mongom2m',\n"
         TEMPLATE_VARIABLES['installed_apps'] = apps
     if not TEMPLATE_VARIABLES['append_slash']:
         TEMPLATE_VARIABLES['append_slash'] = "APPEND_SLASH = %s" % ACTIVE_OPTIONS['append-slash']
+    if not TEMPLATE_VARIABLES['auth_backends']:
+        if ACTIVE_OPTIONS['emailusernames']:
+            TEMPLATE_VARIABLES['auth_backends'] = "AUTHENTICATION_BACKENDS = (\n    'emailusernames.backends.EmailAuthBackend',\n)\n"
     
 def expand_template_variables(content, is_django_template):
     for key, value in TEMPLATE_VARIABLES.items():

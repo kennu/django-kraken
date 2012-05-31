@@ -97,6 +97,8 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+{{ auth_backends }}
+
 MIDDLEWARE_CLASSES = (
     'mediagenerator.middleware.MediaMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -192,8 +194,9 @@ MEDIA_BUNDLES = (
 )
 
 # Login and registration settings
-LOGIN_URL = '/accounts/login/'
-LOGOUT_URL = '/accounts/logout/'
+LOGIN_URL = '/accounts/login'
+LOGOUT_URL = '/accounts/logout'
 LOGIN_REDIRECT_URL = '/me'
 AUTH_PROFILE_MODULE = 'users.UserProfile'
-
+ACCOUNT_ACTIVATION_DAYS = 30
+DEFAULT_FROM_EMAIL = '{{ project_title }} <{{ project_name }}>'
