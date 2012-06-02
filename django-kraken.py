@@ -216,11 +216,11 @@ def setup_template_variables():
         TEMPLATE_VARIABLES['secret_key'] = ''.join([random.choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
     if not TEMPLATE_VARIABLES['installed_apps']:
         apps = ''
-        if ACTIVE_PARAMS['db'] == 'mongodb': apps += "    'djangotoolbox',\n"
         if ACTIVE_OPTIONS['extensions']: apps += "    'django_extensions',\n"
         if ACTIVE_OPTIONS['mediagenerator']: apps += "    'mediagenerator',\n"
         if ACTIVE_OPTIONS['registration']: apps += "    'registration',\n"
         if ACTIVE_OPTIONS['emailusernames']: apps += "    'emailusernames',\n"
+        if ACTIVE_PARAMS['db'] == 'mongodb': apps += "    'djangotoolbox',\n"
         if ACTIVE_OPTIONS['social-auth']: apps += "    'social_auth',\n"
         if ACTIVE_OPTIONS['gravatar']: apps += "    'gravatar',\n"
         if ACTIVE_OPTIONS['mongom2m']: apps += "    'mongom2m',\n"

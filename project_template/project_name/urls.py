@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.simple import direct_to_template
 from users.forms import EmailUserCreationForm
+from emailusernames.forms import EmailAdminAuthenticationForm
 
 # Enable the admin:
 from django.contrib import admin
@@ -28,7 +29,7 @@ urlpatterns += patterns('registration.views',
 
 # Authentication views
 urlpatterns += patterns('django.contrib.auth.views',
-    url(r'^accounts/login$', 'login', {'template_name': 'registration/login.html'}, name='auth_login'),
+    url(r'^accounts/login$', 'login', {'template_name': 'registration/login.html', 'authentication_form':EmailAdminAuthenticationForm}, name='auth_login'),
     url(r'^accounts/logout$', 'logout', {'template_name': 'registration/logout.html'}, name='auth_logout'),
     url(r'^accounts/password/change$', 'password_change', name='auth_password_change'),
     url(r'^accounts/password/change/done$', 'password_change_done', name='auth_password_change_done'),
