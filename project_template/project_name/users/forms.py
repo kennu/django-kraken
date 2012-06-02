@@ -12,4 +12,5 @@ class EmailUserCreationForm(OriginalEmailUserCreationForm):
 
 # Override to fix order of email and password fields.
 class EmailAuthenticationForm(OriginalEmailAuthenticationForm):
+    email = forms.EmailField(label=_("Email"), max_length=75)
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
