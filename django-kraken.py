@@ -88,6 +88,7 @@ ACTIVE_PARAMS = dict([(opt[2:], default) for opt, (doc, default) in AVAILABLE_PA
 # Template variables to expand.
 TEMPLATE_VARIABLES = {
     'project_name': '',
+    'project_capitalized_name': '',
     'project_title': '',
     'server_user': '',
     'web_user': '',
@@ -104,7 +105,8 @@ TEMPLATE_VARIABLES = {
     'secret_key': '',
     'auth_backends': '',
     'template_context_processors': '',
-    'middleware_classes': '',
+    'pre_middleware_classes': '',
+    'post_middleware_classes': '',
     'installed_apps': '',
     'append_slash': '',
 }
@@ -191,6 +193,8 @@ def install_requirements():
 def setup_template_variables():
     if not TEMPLATE_VARIABLES['project_name']:
         TEMPLATE_VARIABLES['project_name'] = PROJECT_NAME
+    if not TEMPLATE_VARIABLES['project_capitalized_name']:
+        TEMPLATE_VARIABLES['project_capitalized_name'] = PROJECT_NAME.capitalize()
     if not TEMPLATE_VARIABLES['project_title']:
         TEMPLATE_VARIABLES['project_title'] = PROJECT_NAME.capitalize()
     if not TEMPLATE_VARIABLES['server_user']:
@@ -231,7 +235,19 @@ def setup_template_variables():
         TEMPLATE_VARIABLES['append_slash'] = "APPEND_SLASH = %s" % ACTIVE_OPTIONS['append-slash']
     if not TEMPLATE_VARIABLES['auth_backends']:
         if ACTIVE_OPTIONS['emailusernames']:
-            TEMPLATE_VARIABLES['auth_backends'] = "AUTHENTICATION_BACKENDS = (\n    'emailusernames.backends.EmailAuthBackend',\n)\n"
+            auth_backends = []
+            if ACTIVE_OPTIONS['facebook']:
+                auth_backends.append('social_auth.backends.facebook.FacebookBackend')
+            if ACTIVE_OPTIONS['emailusernames']:
+                auth_backends.append('emailusernames.backends.EmailAuthBackend')
+            backends = ''.join(["    '%s',\n" % auth_backend for auth_backend in auth_backends])
+            TEMPLATE_VARIABLES['auth_backends'] = "AUTHENTICATION_BACKENDS = (\n%s)\n" % backends
+    if not TEMPLATE_VARIABLES['pre_middleware_classes']:
+        classes = ['mediagenerator.middleware.MediaMiddleware']
+        TEMPLATE_VARIABLES['pre_middleware_classes'] = ''.join(["    '%s',\n" % c for c in classes])
+    if not TEMPLATE_VARIABLES['post_middleware_classes']:
+        classes = ['middleware.%sMiddleware' % TEMPLATE_VARIABLES['project_capitalized_name']]
+        TEMPLATE_VARIABLES['post_middleware_classes'] = ''.join(["    '%s',\n" % c for c in classes])
     
 def expand_template_variables(content, is_django_template):
     for key, value in TEMPLATE_VARIABLES.items():

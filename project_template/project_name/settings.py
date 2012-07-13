@@ -100,7 +100,7 @@ TEMPLATE_LOADERS = (
 {{ auth_backends }}
 
 MIDDLEWARE_CLASSES = (
-    'mediagenerator.middleware.MediaMiddleware',
+{{ pre_middleware_classes }}
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -108,7 +108,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    {{ middleware_classes }}
+{{ post_middleware_classes }}
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
