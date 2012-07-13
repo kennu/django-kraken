@@ -204,4 +204,4 @@ DEFAULT_FROM_EMAIL = '{{ project_title }} <{{ project_name }}>'
 # Social auth settings
 FACEBOOK_APP_ID = ''
 FACEBOOK_API_SECRET = ''
-
+FACEBOOK_EXTENDED_PERMISSIONS = ['email']
