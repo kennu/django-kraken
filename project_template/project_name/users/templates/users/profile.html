@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}{{ user.get_full_name }}{% endblock %}
+{% block title %}{{ user.get_full_name|default:user.email }}{% endblock %}
 {% block content %}
 <div class="row">
   <div class="span12">
-    <div class="page-header"><h1>{{ user.get_full_name }}</h1></div>
-    <p>User profile page for {{ user.get_full_name }}</p>
+    <div class="page-header"><h1>{{ user.get_full_name|default:user.email }}</h1></div>
+    <p>User profile page for {{ user.get_full_name|default:user.email }}</p>
   </div>
 </div>
 {% endblock %}

@@ -200,3 +200,8 @@ LOGIN_REDIRECT_URL = '/me'
 AUTH_PROFILE_MODULE = 'users.UserProfile'
 ACCOUNT_ACTIVATION_DAYS = 30
 DEFAULT_FROM_EMAIL = '{{ project_title }} <{{ project_name }}>'
+
+# Social auth settings
+FACEBOOK_APP_ID = ''
+FACEBOOK_API_SECRET = ''
+

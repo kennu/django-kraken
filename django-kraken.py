@@ -69,7 +69,9 @@ DB_PACKAGES = {
 
 # Package version specifiers. Default is no version.
 PACKAGE_VERSIONS = {
+    'django': '<1.4',
     'pymongo': '<2.2',
+    'django-email-as-username': '<1.4.7',
 }
 
 # Package URLs for packages that are not in PyPI
