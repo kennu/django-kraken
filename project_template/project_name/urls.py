@@ -17,6 +17,11 @@ urlpatterns += patterns('users.views',
     url(r'^me$', 'profile_me', name='user_profile_me'),
 )
 
+# Social auth URLs
+urlpatterns += patterns('',
+    url(r'', include('social_auth.urls')),
+)
+
 # Registration views
 urlpatterns += patterns('registration.views',
     url(r'^accounts/register$', 'register', {'backend': 'registration.backends.default.DefaultBackend', 'form_class':EmailUserCreationForm}, name='registration_register'),
