@@ -1,3 +1,5 @@
 .DS_Store
 *.pyc
+{{ project_name }}/_generated_media
+{{ project_name }}/_generated_media_names.py
 {{ project_name }}/public/static
