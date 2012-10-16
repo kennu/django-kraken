@@ -28,7 +28,7 @@ urlpatterns += patterns('registration.views',
     url(r'^accounts/register/complete$', direct_to_template, {'template': 'registration/registration_complete.html'}, name='registration_complete'),
     url(r'^accounts/register/closed$', direct_to_template, {'template': 'registration/registration_closed.html'}, name='registration_disallowed'),
     url(r'^accounts/activate/complete$', direct_to_template, {'template': 'registration/activation_complete.html'}, name='registration_activation_complete'),
-    url(r'^accounts/activate/(?P<activation_key>\w+)$', 'activate', {'backend': 'registration.backends.default.DefaultBackend'}, name='registration_activate'),
+    url(r'^accounts/activate/(?P<activation_key>\w+)/?$', 'activate', {'backend': 'registration.backends.default.DefaultBackend'}, name='registration_activate'),
 )
 
 # Authentication views
